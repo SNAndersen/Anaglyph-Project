@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Icon=/home/pi/Anaglyph/Anaglyph.png
+Name=Anaglyph Playlist
+Comment=3D to Anaglyph Video Playlist Player      
+Categories=AudioVideo
+Exec=lxterminal --working-directory=/home/pi/Anaglyph/ -e ./read_playlist.sh
+StartupNotify=true
+Encoding=UTF-8
+Terminal=true

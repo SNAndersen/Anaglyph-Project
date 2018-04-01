@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Compiler Value="/usr/bin/fpc" Date="1501194183"/>
+  <Params Value=" -MObjFPC -Scghi -O1 -g -gl -l -vewnhibq -Fi/home/pi/Documents/Lazarus/Anaglyph_Clp/lib/arm-linux -Fl/opt/gnome/lib -Fu/usr/lib/lazarus/1.6.2/lcl/units/arm-linux/gtk2 -Fu/usr/lib/lazarus/1.6.2/lcl/units/arm-linux -Fu/usr/lib/lazarus/1.6.2/components/lazutils/lib/arm-linux -Fu/usr/lib/lazarus/1.6.2/packager/units/arm-linux -Fu/home/pi/Documents/Lazarus/Anaglyph_Clp/ -FU/home/pi/Documents/Lazarus/Anaglyph_Clp/lib/arm-linux/ -dLCL -dLCLgtk2 Anaglyph_Clipboard.lpr"/>
+</CONFIG>

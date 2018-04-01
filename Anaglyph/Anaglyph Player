@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Icon=/home/pi/Anaglyph/Anaglyph.png
+Name=Anaglyph Player
+Comment=3D to Anaglyph Video Player      
+Categories=AudioVideo
+Exec=/home/pi/Anaglyph/Anaglyph
+StartupNotify=true
+Terminal=false
+Path=/home/pi/Anaglyph
