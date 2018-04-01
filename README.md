@@ -1,5 +1,7 @@
 # Anaglyph-Project
 Anaglyph player for Raspberry Pi
+
+
 Installation:
 
 All executables and scripts are located in folder Anaglyph.
