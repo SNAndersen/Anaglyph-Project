@@ -1,7 +1,7 @@
 object Form1: TForm1
-  Left = 236
+  Left = 287
   Height = 640
-  Top = 160
+  Top = 175
   Width = 957
   ActiveControl = Panel2
   BorderIcons = [biSystemMenu]
@@ -1083,7 +1083,6 @@ object Form1: TForm1
   OnDestroy = FormDestroy
   OnKeyDown = FormKeyDown
   OnKeyPress = FormKeyPress
-  OnKeyUp = FormKeyUp
   Position = poScreenCenter
   LCLVersion = '1.6.2.0'
   object Panel2: TPanel

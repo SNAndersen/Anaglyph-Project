@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Icon=/home/pi/Documents/Lazarus/Anaglyph_Player/Anaglyph.png
+Name=Anaglyph Player
+Comment=3D to Anaglyph Video Player      
+Categories=AudioVideo
+Exec=/home/pi/Documents/Lazarus/Anaglyph_Player/Anaglyph
+StartupNotify=true
+Terminal=false

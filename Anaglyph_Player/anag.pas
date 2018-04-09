@@ -49,7 +49,6 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
     procedure FormKeyPress(Sender: TObject; var Key: char);
-    procedure FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
     { private declarations }
   public
@@ -65,8 +64,9 @@ var
   ReturnStr:ansistring;
   x1,x2,y1,y2:integer;
   VideoWidth,VideoHeight:integer;
-  filename,subfilename,s0,s1,s2,s:string;
+  filename,subfilename,s0,s1,s2,s3,s:string;
   resstr,stereomode:string;
+  FullScreen:boolean;
 
 implementation
 
@@ -113,6 +113,7 @@ begin
   ReadIniFile;
   filename:='';
   subfilename:='';
+  FullScreen:=false;
 end;
 
 procedure TForm1.FormDblClick(Sender: TObject);
@@ -127,27 +128,42 @@ end;
 
 procedure TForm1.FormKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState
   );
-var
-  arrow:Word;
-
 begin
   if (Key=VK_UP) or (Key=VK_DOWN) or (Key=VK_LEFT) or (Key=VK_RIGHT) then
   begin
     // values found with showkey -a in lxterminal
-    (*
     case Key of
-      VK_UP    : if AProcess.Running then AProcess.Input.WriteDWord($1B5B41);
-      VK_DOWN  : if AProcess.Running then AProcess.Input.WriteDWord($1B5B42);
-      VK_RIGHT : if AProcess.Running then AProcess.Input.WriteDWord($1B5B43);
-      VK_LEFT  : if AProcess.Running then AProcess.Input.WriteDWord($1B5B44);
-    end;
-    *)
+      VK_UP    :begin
+                  if AProcess.Running then
+                  begin
+                    AProcess.Input.WriteAnsiString(chr($1B)+'[A');
+                  end;
+                end;
+      VK_DOWN  :begin
+                  if AProcess.Running then
+                  begin
+                    AProcess.Input.WriteAnsiString(chr($1B)+'[B');
+                  end;
+                end;
+      VK_RIGHT :begin
+                  if AProcess.Running then
+                  begin
+                    AProcess.Input.WriteAnsiString(chr($1B)+'[C');
+                  end;
+                end;
+      VK_LEFT  :begin
+                  if AProcess.Running then
+                  begin
+                    AProcess.Input.WriteAnsiString(chr($1B)+'[D');
+                  end;
+                end;
+    end;  //end case
   end;
 end;
 
 procedure TForm1.FormKeyPress(Sender: TObject; var Key: char);
 begin
-  if AProcess.Running then AProcess.Input.Write(Key,1);
+  if AProcess.Running then AProcess.Input.WriteAnsiString(Key);
   if (Key = 'q') or (Key = chr($1B)) then
   begin
     if AProcess.Running then
@@ -157,19 +173,6 @@ begin
     end;
   end;
 end;
-
-procedure TForm1.FormKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-
-var
-  arrow:Word;
-
-begin
-  if (Key=VK_UP) or (Key=VK_DOWN) or (Key=VK_LEFT) or (Key=VK_RIGHT) then
-  begin
-
-  end;
-end;
-
 
 procedure TForm1.Button1Click(Sender: TObject);
 
@@ -186,6 +189,7 @@ begin
   end;
   if OpenDialog1.Execute then
   begin
+    FullScreen:=false;
     filename:=OpenDialog1.FileName;
     s2:='';
     subfilename:=ChangeFileExt(filename,'.srt');
@@ -341,6 +345,8 @@ begin
       (*
       // this structure do NOT work for reasons unknown
       // works fine getting file information see above
+      AProcess:=TProcess.Create(nil);
+      AProcess.Executable:='omxplayer';
       AProcess.Active:=true;
       AProcess.Parameters.Clear;
       AProcess.Parameters.Add(s0);
@@ -371,6 +377,7 @@ begin
       AProcess.PipeBufferSize:=BUF_SIZE;
       AProcess.Options:=[poUsePipes];
       AProcess.Execute;
+
     end
     else
     begin
@@ -397,28 +404,38 @@ end;
 procedure TForm1.Button2Click(Sender: TObject);
 
 var
-  K:char='q';
+  RetBuf:TStringList;
 
 begin
+  if FullScreen then exit;
   if filename <> '' then
   begin
     if AProcess.Running then
     begin
-      AProcess.Input.Write(K,1);
+      AProcess.Input.WriteAnsiString('q');
+      // now read stop position
+      RetBuf:=TStringList.Create;
+      RetBuf.LoadFromStream(AProcess.Output);
+      ReturnStr:=RetBuf.Text;
+      RetBuf.Free;
       AProcess.Active:=false;
       AProcess.Free;
     end;
-
+    s:=copy(ReturnStr,pos('Stopped at:',ReturnStr),length(s));
+    s:=copy(s,12,length(s));
+    while pos(' ',s) > 0 do delete(s,pos(' ',s),1);
+    delete(s,9,length(s));
+    s3:='-l '+s;
     s1:='--win '+IntToStr(0)+','+IntToStr(0)+','+IntToStr(Screen.Width)+','+IntToStr(Screen.Height);
     if stereomode <> '' then
     begin
       if s2 <> '' then
       begin
-        s:='omxplayer -b '+s0+' '+s1+' '+s2+' '+'"'+filename+'"';
+        s:='omxplayer -b '+s0+' '+s1+' '+s2+' '+s3+' '+'"'+filename+'"';
       end
       else
       begin
-        s:='omxplayer -b '+s0+' '+s1+' '+'"'+filename+'"';
+        s:='omxplayer -b '+s0+' '+s1+' '+s3+' '+'"'+filename+'"';
       end;
       AProcess:=TProcess.Create(nil);
       AProcess.Executable:='omxplayer';
@@ -427,16 +444,17 @@ begin
       AProcess.PipeBufferSize:=BUF_SIZE;
       AProcess.Options:=[poUsePipes];
       AProcess.Execute;
+      FullScreen:=true;
     end
     else
     begin
       if s2 <> '' then
       begin
-        s:='omxplayer -b '+s2+' '+'"'+filename+'"';
+        s:='omxplayer -b '+s2+' '+s3+' '+'"'+filename+'"';
       end
       else
       begin
-        s:='omxplayer -b '+'"'+filename+'"';
+        s:='omxplayer -b '+s3+' '+'"'+filename+'"';
       end;
       AProcess:=TProcess.Create(nil);
       AProcess.Executable:='omxplayer';
@@ -445,23 +463,20 @@ begin
       AProcess.PipeBufferSize:=BUF_SIZE;
       AProcess.Options:=[poUsePipes];
       AProcess.Execute;
+      FullScreen:=true;
     end;
   end;
 end;
 
 procedure TForm1.Button3Click(Sender: TObject);
 
-var
-  quit:char;
-
 begin
   WriteIniFile;
-  quit:='q';
   if AProcess <> nil then
   begin
     if AProcess.Running then
     begin
-      AProcess.Input.Write(quit,1);
+      AProcess.Input.WriteAnsiString('q');
       AProcess.Free;
     end;
   end;
@@ -470,9 +485,6 @@ begin
 end;
 
 procedure TForm1.Button4Click(Sender: TObject);
-
-var
-  quit:char;
 
 begin
   if filename <> '' then
@@ -487,10 +499,9 @@ begin
       s:='omxplayer -b '+s0+' '+s1+' '+'"'+filename+'"';
     end;
     Clipboard.AsText:=s;
-    quit:='q';
     if AProcess.Running then
     begin
-      AProcess.Input.Write(quit,1);
+      AProcess.Input.WriteAnsiString('q');
       AProcess.Active:=false;
       AProcess.Free;
     end;
