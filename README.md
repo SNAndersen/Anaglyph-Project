@@ -51,11 +51,6 @@ Press Full Screen for full screen view, movie will restart.
 Use keyboard commands to control omxplayer, commands can be found here:
 https://www.raspberrypi.org/documentation/raspbian/applications/omxplayer.md
 
-All keyboard commands except arrow keys are supported.
-
-If movie search  is desired ( arrow keys ), you can press Copy to Clipboard and open LXTerminal.
-Place the curson in LXTerminal, right click mouse and select insert, press return and the movie plays.
-
 
 Wrapper two:
 Anaglyph Clipboard:
